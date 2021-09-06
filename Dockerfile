@@ -1,22 +1,23 @@
+# pull official base image
 FROM python:3
+
+# set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONUNBUFFERED=1
 ENV DEBUG=0
-WORKDIR /code
-COPY requirements.txt /code/
-RUN pip install --upgrade pip && pip install -r requirements.txt
-# RUN apt-get update && apt-get install -y build-essential curl git libfreetype6-dev libpng12-dev libzmq3-dev pkg-config python-dev python-numpy python-pip software-properties-common swig zip zlib1g-d && pip install -r requirements.txt
-# RUN apk update && apk add --no-cache libffi-dev && apk add --no-cache python3-dev jpeg-dev zlib-dev && apk add --no-cache postgresql-libs && \
-#  apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
-#  python3 -m pip install -r requirements.txt --no-cache-dir && \
-#  apk --purge del .build-deps
-COPY . /code/
 
-# # entrypoint, must be executable file chmod +x entrypoint.sh
-# COPY entrypoint.sh /home/docker/entrypoint.sh
+# set work directory
+WORKDIR /usr/src/app
 
-# # what happens when I start the container
-# CMD ["/home/docker/entrypoint.sh"]
+# install dependencies
+COPY ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+# copy project
+COPY . .
+
+# collect static files
+RUN python manage.py collectstatic --noinput
 
 # run gunicorn
-CMD gunicorn hello_django.wsgi:application --bind 0.0.0.0:$PORT
+CMD gunicorn todoServe.wsgi:application --bind 0.0.0.0:$PORT

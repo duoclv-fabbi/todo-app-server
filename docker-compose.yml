@@ -1,14 +1,14 @@
 version: "3.9"
 
 services:
-  web_todo:
+  web_3:
     container_name: api_todo_server
     build:
       context: ./
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn todoServe.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/usr/src/app
     ports:
       - "8000:8000"
     env_file: .env
